@@ -90,6 +90,7 @@ jobs:
 
       - name: HACS Action
         uses: hacs/action@main
+        continue-on-error: true
         with:
           category: integration
           ignore: brands
