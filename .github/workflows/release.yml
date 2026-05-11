@@ -3,6 +3,12 @@ name: Release
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to update"
+        required: true
+        default: "v0.1.0"
 
 jobs:
   # Validates the tag version matches manifest.json before publishing.
@@ -16,7 +22,8 @@ jobs:
 
       - name: Check manifest version matches release tag
         run: |
-          TAG="${GITHUB_REF_NAME#v}"   # strip leading 'v' from tag
+          RAW_TAG="${{ github.event.inputs.tag || github.ref_name }}"
+          TAG="${RAW_TAG#v}"   # strip leading 'v' from tag
           MANIFEST_VERSION=$(python3 -c "
           import json, sys
           with open('custom_components/wled_progress_bar/manifest.json') as f:
@@ -53,4 +60,5 @@ jobs:
       - name: Upload release asset
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
           files: wled_progress_bar.zip

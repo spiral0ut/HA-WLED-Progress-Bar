@@ -92,4 +92,4 @@ jobs:
         uses: hacs/action@main
         with:
           category: integration
-          # ignore: brands  # uncomment if you don't have a brands PR yet
+          ignore: brands
