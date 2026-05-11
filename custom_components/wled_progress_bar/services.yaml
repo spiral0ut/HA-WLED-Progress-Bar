@@ -1,0 +1,62 @@
+render_now:
+  name: Render Now
+  description: >
+    Immediately recalculate the progress bar from the current source entity
+    value and push the result to WLED.  Useful in automations where you want
+    an instant update outside of the normal polling interval.
+  fields: {}
+
+set_colors:
+  name: Set Colors
+  description: >
+    Override one or more colour options and push the updated bar to WLED.
+    Overrides are not persisted — the next polling cycle will use the values
+    from the integration options.
+  fields:
+    progress_color:
+      name: Progress Color
+      description: "RGB colour for the filled LEDs, e.g. '0,255,0'"
+      required: false
+      example: "0,255,0"
+      selector:
+        text:
+    background_color:
+      name: Background Color
+      description: "RGB colour for the unfilled LEDs, e.g. '20,20,20'"
+      required: false
+      example: "20,20,20"
+      selector:
+        text:
+    near_complete_color:
+      name: Near-Complete Color
+      description: "RGB colour used when progress ≥ near-complete threshold"
+      required: false
+      example: "255,165,0"
+      selector:
+        text:
+    brightness:
+      name: Brightness
+      description: "WLED global brightness (0–255)"
+      required: false
+      example: 128
+      selector:
+        number:
+          min: 0
+          max: 255
+          step: 1
+
+clear_bar:
+  name: Clear Bar
+  description: >
+    Turn all LEDs in the configured segment off (set to black).  Useful for
+    'off-hours' automations when you want to suppress the display without
+    disabling the integration.
+  fields: {}
+
+turn_off_background:
+  name: Turn Off Background
+  description: >
+    Set the background (unfilled) LEDs to black while leaving the progress
+    LEDs at their current colour.  Equivalent to calling set_colors with
+    background_color='0,0,0'.
+  fields: {}

@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  # Validates the tag version matches manifest.json before publishing.
+  validate-version:
+    name: Validate version consistency
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check manifest version matches release tag
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"   # strip leading 'v' from tag
+          MANIFEST_VERSION=$(python3 -c "
+          import json, sys
+          with open('custom_components/wled_progress_bar/manifest.json') as f:
+              data = json.load(f)
+          print(data['version'])
+          ")
+          echo "Tag version:      $TAG"
+          echo "Manifest version: $MANIFEST_VERSION"
+          if [ "$TAG" != "$MANIFEST_VERSION" ]; then
+            echo "ERROR: Tag ($TAG) does not match manifest.json version ($MANIFEST_VERSION)"
+            exit 1
+          fi
+          echo "Versions match ✓"
+
+  # Attaches a zip of the custom_components directory to the GitHub release.
+  attach-release-asset:
+    name: Attach release zip
+    runs-on: ubuntu-latest
+    needs: validate-version
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build release zip
+        run: |
+          cd custom_components
+          zip -r ../wled_progress_bar.zip wled_progress_bar/
+          echo "Built wled_progress_bar.zip"
+          ls -lh ../wled_progress_bar.zip
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: wled_progress_bar.zip

@@ -1,0 +1,48 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+pip-wheel-metadata/
+*.whl
+
+# ── Testing / coverage ────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+
+# ── Linting ───────────────────────────────────────────────────────────────────
+.ruff_cache/
+.mypy_cache/
+
+# ── Node (Lovelace card dev) ──────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-error.log
+.npm/
+
+# ── OS / editors ──────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+*.code-workspace
+
+# ── Home Assistant dev ────────────────────────────────────────────────────────
+# Local HA config used during development
+config/
+.storage/
+
+# ── Release artefacts ─────────────────────────────────────────────────────────
+*.zip

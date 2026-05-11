@@ -1,0 +1,63 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "WLED Progress Bar – Connect",
+        "description": "Enter the IP address or hostname of your WLED device and the Home Assistant entity whose value should be displayed.",
+        "data": {
+          "host": "WLED Host / IP address",
+          "entity_id": "Source numeric entity"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to WLED device – check the host/IP and ensure WLED is reachable."
+    },
+    "abort": {
+      "already_configured": "This WLED device is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "WLED Progress Bar – Scaling & LED Range",
+        "data": {
+          "entity_id": "Source numeric entity",
+          "min_value": "Minimum value (maps to 0 LEDs)",
+          "max_value": "Maximum value (maps to all LEDs)",
+          "led_count": "Total LED count on strip",
+          "led_start": "Start LED index (0-based)",
+          "led_end": "End LED index (inclusive)",
+          "reverse": "Reverse direction (fill from end)",
+          "update_interval": "Update interval (seconds)",
+          "brightness": "Brightness (0–255)"
+        }
+      },
+      "colors": {
+        "title": "WLED Progress Bar – Colors",
+        "data": {
+          "progress_color": "Progress color (r,g,b)",
+          "background_off": "Background LEDs off",
+          "background_color": "Background color (r,g,b) – used when 'Background off' is disabled",
+          "near_complete_threshold": "Near-complete threshold (%)",
+          "near_complete_color": "Near-complete color (r,g,b)",
+          "gradient_mode": "Enable gradient mode",
+          "gradient_start_color": "Gradient start color (r,g,b)",
+          "gradient_end_color": "Gradient end color (r,g,b)"
+        }
+      }
+    },
+    "error": {
+      "min_gte_max": "Minimum value must be less than maximum value.",
+      "led_start_gte_end": "LED start index must be less than LED end index.",
+      "invalid_rgb": "Invalid RGB value – use the format r,g,b where each component is 0–255."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "progress_percent": {
+        "name": "Progress"
+      }
+    }
+  }
+}
