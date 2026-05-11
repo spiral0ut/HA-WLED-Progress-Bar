@@ -22,24 +22,22 @@ import logging
 from typing import Any
 
 import voluptuous as vol
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import config_validation as cv
 
 from .const import (
+    CONF_BACKGROUND_COLOR,
+    CONF_BRIGHTNESS,
+    CONF_NEAR_COMPLETE_COLOR,
+    CONF_PROGRESS_COLOR,
     COORDINATOR,
     DOMAIN,
     SERVICE_CLEAR_BAR,
     SERVICE_RENDER_NOW,
     SERVICE_SET_COLORS,
     SERVICE_TURN_OFF_BACKGROUND,
-    CONF_PROGRESS_COLOR,
-    CONF_BACKGROUND_COLOR,
-    CONF_NEAR_COMPLETE_COLOR,
-    CONF_BRIGHTNESS,
 )
 from .coordinator import WLEDProgressBarCoordinator
 
@@ -94,6 +92,7 @@ async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> Non
 
 # ── Service schemas ────────────────────────────────────────────────────────────
 
+
 def _rgb_str(value: str) -> str:
     """Validate 'r,g,b' string where each component is 0-255."""
     try:
@@ -142,7 +141,13 @@ def _register_services(hass: HomeAssistant) -> None:
         overrides: dict[str, Any] = {
             k: v
             for k, v in call.data.items()
-            if k in (CONF_PROGRESS_COLOR, CONF_BACKGROUND_COLOR, CONF_NEAR_COMPLETE_COLOR, CONF_BRIGHTNESS)
+            if k
+            in (
+                CONF_PROGRESS_COLOR,
+                CONF_BACKGROUND_COLOR,
+                CONF_NEAR_COMPLETE_COLOR,
+                CONF_BRIGHTNESS,
+            )
         }
         for entry_data in entries.values():
             coord: WLEDProgressBarCoordinator = entry_data[COORDINATOR]
@@ -166,7 +171,15 @@ def _register_services(hass: HomeAssistant) -> None:
             coord: WLEDProgressBarCoordinator = entry_data[COORDINATOR]
             await coord.async_render_now(overrides={CONF_BACKGROUND_COLOR: "0,0,0"})
 
-    hass.services.async_register(DOMAIN, SERVICE_RENDER_NOW, _handle_render_now, schema=_RENDER_NOW_SCHEMA)
-    hass.services.async_register(DOMAIN, SERVICE_SET_COLORS, _handle_set_colors, schema=_SET_COLORS_SCHEMA)
-    hass.services.async_register(DOMAIN, SERVICE_CLEAR_BAR, _handle_clear_bar, schema=_CLEAR_BAR_SCHEMA)
-    hass.services.async_register(DOMAIN, SERVICE_TURN_OFF_BACKGROUND, _handle_turn_off_background, schema=_TURN_OFF_BG_SCHEMA)
+    hass.services.async_register(
+        DOMAIN, SERVICE_RENDER_NOW, _handle_render_now, schema=_RENDER_NOW_SCHEMA
+    )
+    hass.services.async_register(
+        DOMAIN, SERVICE_SET_COLORS, _handle_set_colors, schema=_SET_COLORS_SCHEMA
+    )
+    hass.services.async_register(
+        DOMAIN, SERVICE_CLEAR_BAR, _handle_clear_bar, schema=_CLEAR_BAR_SCHEMA
+    )
+    hass.services.async_register(
+        DOMAIN, SERVICE_TURN_OFF_BACKGROUND, _handle_turn_off_background, schema=_TURN_OFF_BG_SCHEMA
+    )

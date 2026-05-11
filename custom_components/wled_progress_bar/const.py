@@ -40,8 +40,8 @@ CONF_UPDATE_INTERVAL = "update_interval"
 DEFAULT_MIN_VALUE = 0.0
 DEFAULT_MAX_VALUE = 100.0
 DEFAULT_LED_COUNT = 30
-DEFAULT_LED_START = 0          # First LED index (0-based)
-DEFAULT_LED_END = None         # None → use LED_COUNT-1
+DEFAULT_LED_START = 0  # First LED index (0-based)
+DEFAULT_LED_END = None  # None → use LED_COUNT-1
 DEFAULT_BACKGROUND_OFF = True
 DEFAULT_BACKGROUND_COLOR = "0,0,0"
 DEFAULT_PROGRESS_COLOR = "0,255,0"
@@ -52,7 +52,7 @@ DEFAULT_GRADIENT_START_COLOR = "0,0,255"
 DEFAULT_GRADIENT_END_COLOR = "0,255,0"
 DEFAULT_REVERSE = False
 DEFAULT_BRIGHTNESS = 128
-DEFAULT_UPDATE_INTERVAL = 5    # seconds
+DEFAULT_UPDATE_INTERVAL = 5  # seconds
 
 # ── WLED API ──────────────────────────────────────────────────────────────────
 # All calls target the WLED JSON API endpoint: http://<host>/json/state
@@ -61,12 +61,12 @@ DEFAULT_UPDATE_INTERVAL = 5    # seconds
 # this integration uses that approach for maximum flexibility.
 # See: https://kno.wled.ge/interfaces/json-api/
 WLED_JSON_STATE_PATH = "/json/state"
-WLED_JSON_INFO_PATH  = "/json/info"
+WLED_JSON_INFO_PATH = "/json/info"
 
 # ── Services ──────────────────────────────────────────────────────────────────
-SERVICE_RENDER_NOW         = "render_now"
-SERVICE_SET_COLORS         = "set_colors"
-SERVICE_CLEAR_BAR          = "clear_bar"
+SERVICE_RENDER_NOW = "render_now"
+SERVICE_SET_COLORS = "set_colors"
+SERVICE_CLEAR_BAR = "clear_bar"
 SERVICE_TURN_OFF_BACKGROUND = "turn_off_background"
 
 # ── Coordinator / DataStore ───────────────────────────────────────────────────

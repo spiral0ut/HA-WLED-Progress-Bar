@@ -45,9 +45,8 @@ from datetime import timedelta
 from typing import Any
 
 import aiohttp
-
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import (
@@ -58,6 +57,7 @@ from .const import (
     CONF_GRADIENT_END_COLOR,
     CONF_GRADIENT_MODE,
     CONF_GRADIENT_START_COLOR,
+    CONF_HOST,
     CONF_LED_COUNT,
     CONF_LED_END,
     CONF_LED_START,
@@ -191,12 +191,12 @@ class WLEDProgressBarCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
         self._entry = entry
         self._host: str = entry.data[CONF_HOST]
-        self._entity_id: str = entry.data.get(CONF_ENTITY_ID, "") or entry.options.get(CONF_ENTITY_ID, "")
+        self._entity_id: str = entry.data.get(CONF_ENTITY_ID, "") or entry.options.get(
+            CONF_ENTITY_ID, ""
+        )
 
         # Will be overridden from options each refresh cycle.
-        interval = int(
-            entry.options.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL)
-        )
+        interval = int(entry.options.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL))
 
         super().__init__(
             hass,
@@ -227,9 +227,7 @@ class WLEDProgressBarCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         """Fetch state and push to WLED.  Called by the coordinator timer."""
         # Refresh entity_id in case options were updated.
         entity_id = (
-            self._entry.data.get(CONF_ENTITY_ID)
-            or self._entry.options.get(CONF_ENTITY_ID)
-            or ""
+            self._entry.data.get(CONF_ENTITY_ID) or self._entry.options.get(CONF_ENTITY_ID) or ""
         )
         if not entity_id:
             raise UpdateFailed("No source entity configured")
@@ -263,27 +261,38 @@ class WLEDProgressBarCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         opts = self._entry.options
         ov = overrides or {}
 
-        min_val   = float(opts.get(CONF_MIN_VALUE, DEFAULT_MIN_VALUE))
-        max_val   = float(opts.get(CONF_MAX_VALUE, DEFAULT_MAX_VALUE))
+        min_val = float(opts.get(CONF_MIN_VALUE, DEFAULT_MIN_VALUE))
+        max_val = float(opts.get(CONF_MAX_VALUE, DEFAULT_MAX_VALUE))
         led_start = int(opts.get(CONF_LED_START, 0))
         led_count = int(opts.get(CONF_LED_COUNT, DEFAULT_LED_COUNT))
-        led_end   = int(opts.get(CONF_LED_END, led_start + led_count - 1))
+        led_end = int(opts.get(CONF_LED_END, led_start + led_count - 1))
         total_leds = led_end - led_start + 1
 
-        brightness    = int(ov.get(CONF_BRIGHTNESS, opts.get(CONF_BRIGHTNESS, DEFAULT_BRIGHTNESS)))
-        reverse       = bool(opts.get(CONF_REVERSE, DEFAULT_REVERSE))
+        brightness = int(ov.get(CONF_BRIGHTNESS, opts.get(CONF_BRIGHTNESS, DEFAULT_BRIGHTNESS)))
+        reverse = bool(opts.get(CONF_REVERSE, DEFAULT_REVERSE))
         gradient_mode = bool(opts.get(CONF_GRADIENT_MODE, DEFAULT_GRADIENT_MODE))
-        bg_off        = bool(opts.get(CONF_BACKGROUND_OFF, DEFAULT_BACKGROUND_OFF))
+        bg_off = bool(opts.get(CONF_BACKGROUND_OFF, DEFAULT_BACKGROUND_OFF))
 
-        progress_color   = _parse_rgb(ov.get(CONF_PROGRESS_COLOR, opts.get(CONF_PROGRESS_COLOR, DEFAULT_PROGRESS_COLOR)))
-        bg_color_str     = ov.get(CONF_BACKGROUND_COLOR, opts.get(CONF_BACKGROUND_COLOR, DEFAULT_BACKGROUND_COLOR))
+        progress_color = _parse_rgb(
+            ov.get(CONF_PROGRESS_COLOR, opts.get(CONF_PROGRESS_COLOR, DEFAULT_PROGRESS_COLOR))
+        )
+        bg_color_str = ov.get(
+            CONF_BACKGROUND_COLOR, opts.get(CONF_BACKGROUND_COLOR, DEFAULT_BACKGROUND_COLOR)
+        )
         background_color = None if bg_off else _parse_rgb(bg_color_str)
 
-        near_threshold = float(opts.get(CONF_NEAR_COMPLETE_THRESHOLD, DEFAULT_NEAR_COMPLETE_THRESHOLD))
-        near_color     = _parse_rgb(ov.get(CONF_NEAR_COMPLETE_COLOR, opts.get(CONF_NEAR_COMPLETE_COLOR, DEFAULT_NEAR_COMPLETE_COLOR)))
+        near_threshold = float(
+            opts.get(CONF_NEAR_COMPLETE_THRESHOLD, DEFAULT_NEAR_COMPLETE_THRESHOLD)
+        )
+        near_color = _parse_rgb(
+            ov.get(
+                CONF_NEAR_COMPLETE_COLOR,
+                opts.get(CONF_NEAR_COMPLETE_COLOR, DEFAULT_NEAR_COMPLETE_COLOR),
+            )
+        )
 
         grad_start = _parse_rgb(opts.get(CONF_GRADIENT_START_COLOR, DEFAULT_GRADIENT_START_COLOR))
-        grad_end   = _parse_rgb(opts.get(CONF_GRADIENT_END_COLOR, DEFAULT_GRADIENT_END_COLOR))
+        grad_end = _parse_rgb(opts.get(CONF_GRADIENT_END_COLOR, DEFAULT_GRADIENT_END_COLOR))
 
         # ── Clamp and calculate percent ────────────────────────────────────────
         value_range = max_val - min_val
@@ -326,7 +335,7 @@ class WLEDProgressBarCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             "seg": [
                 {
                     "id": 0,
-                    "fx": 0,    # Force Solid effect so "i" colours are respected.
+                    "fx": 0,  # Force Solid effect so "i" colours are respected.
                     "i": individual_payload,
                 }
             ],
@@ -372,9 +381,7 @@ class WLEDProgressBarCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     async def async_render_now(self, overrides: dict[str, Any] | None = None) -> None:
         """Force an immediate render cycle (called by the render_now service)."""
         entity_id = (
-            self._entry.data.get(CONF_ENTITY_ID)
-            or self._entry.options.get(CONF_ENTITY_ID)
-            or ""
+            self._entry.data.get(CONF_ENTITY_ID) or self._entry.options.get(CONF_ENTITY_ID) or ""
         )
         state = self.hass.states.get(entity_id)
         if state is None or state.state in ("unavailable", "unknown"):
@@ -392,7 +399,7 @@ class WLEDProgressBarCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         opts = self._entry.options
         led_start = int(opts.get(CONF_LED_START, 0))
         led_count = int(opts.get(CONF_LED_COUNT, DEFAULT_LED_COUNT))
-        led_end   = int(opts.get(CONF_LED_END, led_start + led_count - 1))
+        led_end = int(opts.get(CONF_LED_END, led_start + led_count - 1))
         brightness = int(opts.get(CONF_BRIGHTNESS, DEFAULT_BRIGHTNESS))
 
         # Build an all-black individual payload.

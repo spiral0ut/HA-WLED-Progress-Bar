@@ -15,13 +15,11 @@ from typing import Any
 
 import aiohttp
 import voluptuous as vol
-
-from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, OptionsFlow
 from homeassistant.const import CONF_HOST
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
-from homeassistant.helpers import entity_registry as er, selector
+from homeassistant.helpers import selector
 
 from .const import (
     CONF_BACKGROUND_COLOR,
@@ -93,6 +91,7 @@ async def _async_test_wled_connection(host: str) -> dict[str, Any] | None:
 
 # ── Initial config flow ────────────────────────────────────────────────────────
 
+
 class WLEDProgressBarConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle the initial setup config flow."""
 
@@ -103,9 +102,7 @@ class WLEDProgressBarConfigFlow(ConfigFlow, domain=DOMAIN):
     def async_get_options_flow(config_entry: ConfigEntry) -> WLEDProgressBarOptionsFlow:
         return WLEDProgressBarOptionsFlow(config_entry)
 
-    async def async_step_user(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         errors: dict[str, str] = {}
 
         if user_input is not None:
@@ -169,6 +166,7 @@ class WLEDProgressBarConfigFlow(ConfigFlow, domain=DOMAIN):
 
 # ── Options flow ───────────────────────────────────────────────────────────────
 
+
 class WLEDProgressBarOptionsFlow(OptionsFlow):
     """Handle live reconfiguration of all options."""
 
@@ -176,9 +174,7 @@ class WLEDProgressBarOptionsFlow(OptionsFlow):
         self._config_entry = config_entry
         self._options = dict(config_entry.options)
 
-    async def async_step_init(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Step 1: scaling and LED range."""
         errors: dict[str, str] = {}
 
@@ -195,46 +191,83 @@ class WLEDProgressBarOptionsFlow(OptionsFlow):
         opts = self._options
         schema = vol.Schema(
             {
-                vol.Required(CONF_ENTITY_ID, default=self._config_entry.data.get(CONF_ENTITY_ID, "")): selector.EntitySelector(
+                vol.Required(
+                    CONF_ENTITY_ID, default=self._config_entry.data.get(CONF_ENTITY_ID, "")
+                ): selector.EntitySelector(
                     selector.EntitySelectorConfig(domain=["sensor", "input_number", "number"])
                 ),
-                vol.Required(CONF_MIN_VALUE, default=opts.get(CONF_MIN_VALUE, DEFAULT_MIN_VALUE)): selector.NumberSelector(
+                vol.Required(
+                    CONF_MIN_VALUE, default=opts.get(CONF_MIN_VALUE, DEFAULT_MIN_VALUE)
+                ): selector.NumberSelector(
                     selector.NumberSelectorConfig(mode=selector.NumberSelectorMode.BOX, step=0.1)
                 ),
-                vol.Required(CONF_MAX_VALUE, default=opts.get(CONF_MAX_VALUE, DEFAULT_MAX_VALUE)): selector.NumberSelector(
+                vol.Required(
+                    CONF_MAX_VALUE, default=opts.get(CONF_MAX_VALUE, DEFAULT_MAX_VALUE)
+                ): selector.NumberSelector(
                     selector.NumberSelectorConfig(mode=selector.NumberSelectorMode.BOX, step=0.1)
                 ),
-                vol.Required(CONF_LED_COUNT, default=opts.get(CONF_LED_COUNT, DEFAULT_LED_COUNT)): selector.NumberSelector(
-                    selector.NumberSelectorConfig(min=1, max=1000, mode=selector.NumberSelectorMode.BOX, step=1)
+                vol.Required(
+                    CONF_LED_COUNT, default=opts.get(CONF_LED_COUNT, DEFAULT_LED_COUNT)
+                ): selector.NumberSelector(
+                    selector.NumberSelectorConfig(
+                        min=1, max=1000, mode=selector.NumberSelectorMode.BOX, step=1
+                    )
                 ),
-                vol.Required(CONF_LED_START, default=opts.get(CONF_LED_START, 0)): selector.NumberSelector(
-                    selector.NumberSelectorConfig(min=0, max=999, mode=selector.NumberSelectorMode.BOX, step=1)
+                vol.Required(
+                    CONF_LED_START, default=opts.get(CONF_LED_START, 0)
+                ): selector.NumberSelector(
+                    selector.NumberSelectorConfig(
+                        min=0, max=999, mode=selector.NumberSelectorMode.BOX, step=1
+                    )
                 ),
-                vol.Required(CONF_LED_END, default=opts.get(CONF_LED_END, opts.get(CONF_LED_COUNT, DEFAULT_LED_COUNT) - 1)): selector.NumberSelector(
-                    selector.NumberSelectorConfig(min=1, max=1000, mode=selector.NumberSelectorMode.BOX, step=1)
+                vol.Required(
+                    CONF_LED_END,
+                    default=opts.get(CONF_LED_END, opts.get(CONF_LED_COUNT, DEFAULT_LED_COUNT) - 1),
+                ): selector.NumberSelector(
+                    selector.NumberSelectorConfig(
+                        min=1, max=1000, mode=selector.NumberSelectorMode.BOX, step=1
+                    )
                 ),
-                vol.Required(CONF_REVERSE, default=opts.get(CONF_REVERSE, DEFAULT_REVERSE)): selector.BooleanSelector(),
-                vol.Required(CONF_UPDATE_INTERVAL, default=opts.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL)): selector.NumberSelector(
-                    selector.NumberSelectorConfig(min=1, max=3600, mode=selector.NumberSelectorMode.BOX, step=1, unit_of_measurement="s")
+                vol.Required(
+                    CONF_REVERSE, default=opts.get(CONF_REVERSE, DEFAULT_REVERSE)
+                ): selector.BooleanSelector(),
+                vol.Required(
+                    CONF_UPDATE_INTERVAL,
+                    default=opts.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL),
+                ): selector.NumberSelector(
+                    selector.NumberSelectorConfig(
+                        min=1,
+                        max=3600,
+                        mode=selector.NumberSelectorMode.BOX,
+                        step=1,
+                        unit_of_measurement="s",
+                    )
                 ),
-                vol.Required(CONF_BRIGHTNESS, default=opts.get(CONF_BRIGHTNESS, DEFAULT_BRIGHTNESS)): selector.NumberSelector(
-                    selector.NumberSelectorConfig(min=0, max=255, mode=selector.NumberSelectorMode.SLIDER, step=1)
+                vol.Required(
+                    CONF_BRIGHTNESS, default=opts.get(CONF_BRIGHTNESS, DEFAULT_BRIGHTNESS)
+                ): selector.NumberSelector(
+                    selector.NumberSelectorConfig(
+                        min=0, max=255, mode=selector.NumberSelectorMode.SLIDER, step=1
+                    )
                 ),
             }
         )
 
         return self.async_show_form(step_id="init", data_schema=schema, errors=errors)
 
-    async def async_step_colors(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    async def async_step_colors(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Step 2: colour configuration."""
         errors: dict[str, str] = {}
 
         if user_input is not None:
             try:
-                for key in (CONF_PROGRESS_COLOR, CONF_BACKGROUND_COLOR, CONF_NEAR_COMPLETE_COLOR,
-                            CONF_GRADIENT_START_COLOR, CONF_GRADIENT_END_COLOR):
+                for key in (
+                    CONF_PROGRESS_COLOR,
+                    CONF_BACKGROUND_COLOR,
+                    CONF_NEAR_COMPLETE_COLOR,
+                    CONF_GRADIENT_START_COLOR,
+                    CONF_GRADIENT_END_COLOR,
+                ):
                     if key in user_input:
                         _rgb_str_validator(user_input[key])
             except vol.Invalid as exc:
@@ -248,16 +281,45 @@ class WLEDProgressBarOptionsFlow(OptionsFlow):
         opts = self._options
         schema = vol.Schema(
             {
-                vol.Required(CONF_PROGRESS_COLOR, default=opts.get(CONF_PROGRESS_COLOR, DEFAULT_PROGRESS_COLOR)): str,
-                vol.Required(CONF_BACKGROUND_OFF, default=opts.get(CONF_BACKGROUND_OFF, DEFAULT_BACKGROUND_OFF)): selector.BooleanSelector(),
-                vol.Required(CONF_BACKGROUND_COLOR, default=opts.get(CONF_BACKGROUND_COLOR, DEFAULT_BACKGROUND_COLOR)): str,
-                vol.Required(CONF_NEAR_COMPLETE_THRESHOLD, default=opts.get(CONF_NEAR_COMPLETE_THRESHOLD, DEFAULT_NEAR_COMPLETE_THRESHOLD)): selector.NumberSelector(
-                    selector.NumberSelectorConfig(min=0, max=100, mode=selector.NumberSelectorMode.SLIDER, step=1, unit_of_measurement="%")
+                vol.Required(
+                    CONF_PROGRESS_COLOR,
+                    default=opts.get(CONF_PROGRESS_COLOR, DEFAULT_PROGRESS_COLOR),
+                ): str,
+                vol.Required(
+                    CONF_BACKGROUND_OFF,
+                    default=opts.get(CONF_BACKGROUND_OFF, DEFAULT_BACKGROUND_OFF),
+                ): selector.BooleanSelector(),
+                vol.Required(
+                    CONF_BACKGROUND_COLOR,
+                    default=opts.get(CONF_BACKGROUND_COLOR, DEFAULT_BACKGROUND_COLOR),
+                ): str,
+                vol.Required(
+                    CONF_NEAR_COMPLETE_THRESHOLD,
+                    default=opts.get(CONF_NEAR_COMPLETE_THRESHOLD, DEFAULT_NEAR_COMPLETE_THRESHOLD),
+                ): selector.NumberSelector(
+                    selector.NumberSelectorConfig(
+                        min=0,
+                        max=100,
+                        mode=selector.NumberSelectorMode.SLIDER,
+                        step=1,
+                        unit_of_measurement="%",
+                    )
                 ),
-                vol.Required(CONF_NEAR_COMPLETE_COLOR, default=opts.get(CONF_NEAR_COMPLETE_COLOR, DEFAULT_NEAR_COMPLETE_COLOR)): str,
-                vol.Required(CONF_GRADIENT_MODE, default=opts.get(CONF_GRADIENT_MODE, DEFAULT_GRADIENT_MODE)): selector.BooleanSelector(),
-                vol.Required(CONF_GRADIENT_START_COLOR, default=opts.get(CONF_GRADIENT_START_COLOR, DEFAULT_GRADIENT_START_COLOR)): str,
-                vol.Required(CONF_GRADIENT_END_COLOR, default=opts.get(CONF_GRADIENT_END_COLOR, DEFAULT_GRADIENT_END_COLOR)): str,
+                vol.Required(
+                    CONF_NEAR_COMPLETE_COLOR,
+                    default=opts.get(CONF_NEAR_COMPLETE_COLOR, DEFAULT_NEAR_COMPLETE_COLOR),
+                ): str,
+                vol.Required(
+                    CONF_GRADIENT_MODE, default=opts.get(CONF_GRADIENT_MODE, DEFAULT_GRADIENT_MODE)
+                ): selector.BooleanSelector(),
+                vol.Required(
+                    CONF_GRADIENT_START_COLOR,
+                    default=opts.get(CONF_GRADIENT_START_COLOR, DEFAULT_GRADIENT_START_COLOR),
+                ): str,
+                vol.Required(
+                    CONF_GRADIENT_END_COLOR,
+                    default=opts.get(CONF_GRADIENT_END_COLOR, DEFAULT_GRADIENT_END_COLOR),
+                ): str,
             }
         )
 

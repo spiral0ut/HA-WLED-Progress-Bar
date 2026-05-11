@@ -54,5 +54,5 @@ _Nothing yet._
   presets that set a different effect.
 - Gradient mode disables the near-complete colour override.
 
-[Unreleased]: https://github.com/your-username/wled_progress_bar/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/your-username/wled_progress_bar/releases/tag/v0.1.0
+[Unreleased]: https://github.com/spiral0ut/HA-WLED-Progress-Bar/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/spiral0ut/HA-WLED-Progress-Bar/releases/tag/v0.1.0

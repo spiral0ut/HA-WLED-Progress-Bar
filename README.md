@@ -7,10 +7,10 @@
 
 [hacs-badge]: https://img.shields.io/badge/HACS-Custom-orange.svg
 [hacs-url]: https://hacs.xyz
-[release-badge]: https://img.shields.io/github/v/release/your-username/wled_progress_bar
-[release-url]: https://github.com/your-username/wled_progress_bar/releases
-[ci-badge]: https://img.shields.io/github/actions/workflow/status/your-username/wled_progress_bar/ci.yml?branch=main&label=CI
-[ci-url]: https://github.com/your-username/wled_progress_bar/actions/workflows/ci.yml
+[release-badge]: https://img.shields.io/github/v/release/spiral0ut/HA-WLED-Progress-Bar
+[release-url]: https://github.com/spiral0ut/HA-WLED-Progress-Bar/releases
+[ci-badge]: https://img.shields.io/github/actions/workflow/status/spiral0ut/HA-WLED-Progress-Bar/ci.yml?branch=main&label=CI
+[ci-url]: https://github.com/spiral0ut/HA-WLED-Progress-Bar/actions/workflows/ci.yml
 [license-badge]: https://img.shields.io/badge/License-MIT-blue.svg
 
 Turn any [WLED](https://kno.wled.ge/)-connected LED strip into a fully
@@ -80,7 +80,7 @@ HACS lets you install and update custom integrations directly from the HA UI.
 3. Click the **⋮** (three-dot) menu in the top-right corner.
 4. Choose **Custom repositories**.
 5. In the dialog:
-   - **Repository URL:** `https://github.com/your-username/wled_progress_bar`
+   - **Repository URL:** `https://github.com/spiral0ut/HA-WLED-Progress-Bar`
    - **Category:** `Integration`
 6. Click **Add**. The repository now appears in your HACS integration list.
 
@@ -110,7 +110,7 @@ Go to **Settings → Devices & Services → Add Integration** and search for
 Use this method if you don't have HACS or prefer direct file management.
 
 1. Download `wled_progress_bar.zip` from the
-   [latest release](https://github.com/your-username/wled_progress_bar/releases/latest).
+   [latest release](https://github.com/spiral0ut/HA-WLED-Progress-Bar/releases/latest).
 2. Extract the zip. You will find a `custom_components/wled_progress_bar/`
    directory inside.
 3. Copy the entire `wled_progress_bar/` folder into your HA configuration

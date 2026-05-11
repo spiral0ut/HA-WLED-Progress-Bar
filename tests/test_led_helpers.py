@@ -8,6 +8,7 @@ Run with:  pytest tests/test_led_helpers.py -v
 
 # ── Copy of pure helpers (no HA dependencies) ────────────────────────────────
 
+
 def _parse_rgb(rgb_str: str) -> tuple:
     try:
         r, g, b = (int(x.strip()) for x in rgb_str.split(","))
@@ -26,9 +27,15 @@ def _lerp_color(color_a: tuple, color_b: tuple, t: float) -> tuple:
 
 
 def _build_individual_payload(
-    led_start, led_end, filled_count,
-    progress_color, background_color,
-    gradient_mode, gradient_start, gradient_end, reverse,
+    led_start,
+    led_end,
+    filled_count,
+    progress_color,
+    background_color,
+    gradient_mode,
+    gradient_start,
+    gradient_end,
+    reverse,
 ):
     total_leds = led_end - led_start + 1
     bg_rgb = background_color if background_color is not None else (0, 0, 0)
@@ -58,6 +65,7 @@ def _build_individual_payload(
 
 # ── Helper ────────────────────────────────────────────────────────────────────
 
+
 def _led_colors(payload, start, end):
     colors = {}
     i = 0
@@ -70,6 +78,7 @@ def _led_colors(payload, start, end):
 
 
 # ── Tests ──────────────────────────────────────────────────────────────────────
+
 
 class TestParseRGB:
     def test_valid(self):
@@ -123,18 +132,28 @@ class TestLerpColor:
 class TestBuildIndividualPayload:
     def test_payload_length(self):
         payload = _build_individual_payload(
-            led_start=0, led_end=9, filled_count=5,
-            progress_color=(0, 255, 0), background_color=(0, 0, 0),
-            gradient_mode=False, gradient_start=(0, 0, 255), gradient_end=(0, 255, 0),
+            led_start=0,
+            led_end=9,
+            filled_count=5,
+            progress_color=(0, 255, 0),
+            background_color=(0, 0, 0),
+            gradient_mode=False,
+            gradient_start=(0, 0, 255),
+            gradient_end=(0, 255, 0),
             reverse=False,
         )
         assert len(payload) == 10 * 4
 
     def test_filled_forward(self):
         payload = _build_individual_payload(
-            led_start=0, led_end=9, filled_count=4,
-            progress_color=(0, 255, 0), background_color=(50, 50, 50),
-            gradient_mode=False, gradient_start=(0, 0, 255), gradient_end=(0, 255, 0),
+            led_start=0,
+            led_end=9,
+            filled_count=4,
+            progress_color=(0, 255, 0),
+            background_color=(50, 50, 50),
+            gradient_mode=False,
+            gradient_start=(0, 0, 255),
+            gradient_end=(0, 255, 0),
             reverse=False,
         )
         colors = _led_colors(payload, 0, 9)
@@ -145,9 +164,14 @@ class TestBuildIndividualPayload:
 
     def test_filled_reverse(self):
         payload = _build_individual_payload(
-            led_start=0, led_end=9, filled_count=3,
-            progress_color=(255, 0, 0), background_color=(0, 0, 0),
-            gradient_mode=False, gradient_start=(0, 0, 0), gradient_end=(0, 0, 0),
+            led_start=0,
+            led_end=9,
+            filled_count=3,
+            progress_color=(255, 0, 0),
+            background_color=(0, 0, 0),
+            gradient_mode=False,
+            gradient_start=(0, 0, 0),
+            gradient_end=(0, 0, 0),
             reverse=True,
         )
         colors = _led_colors(payload, 0, 9)
@@ -158,9 +182,14 @@ class TestBuildIndividualPayload:
 
     def test_background_none_is_black(self):
         payload = _build_individual_payload(
-            led_start=0, led_end=4, filled_count=2,
-            progress_color=(0, 200, 0), background_color=None,
-            gradient_mode=False, gradient_start=(0, 0, 0), gradient_end=(0, 0, 0),
+            led_start=0,
+            led_end=4,
+            filled_count=2,
+            progress_color=(0, 200, 0),
+            background_color=None,
+            gradient_mode=False,
+            gradient_start=(0, 0, 0),
+            gradient_end=(0, 0, 0),
             reverse=False,
         )
         colors = _led_colors(payload, 0, 4)
@@ -169,9 +198,14 @@ class TestBuildIndividualPayload:
 
     def test_gradient_endpoints(self):
         payload = _build_individual_payload(
-            led_start=0, led_end=4, filled_count=5,
-            progress_color=(0, 0, 0), background_color=(0, 0, 0),
-            gradient_mode=True, gradient_start=(0, 0, 255), gradient_end=(0, 255, 0),
+            led_start=0,
+            led_end=4,
+            filled_count=5,
+            progress_color=(0, 0, 0),
+            background_color=(0, 0, 0),
+            gradient_mode=True,
+            gradient_start=(0, 0, 255),
+            gradient_end=(0, 255, 0),
             reverse=False,
         )
         colors = _led_colors(payload, 0, 4)
@@ -180,9 +214,14 @@ class TestBuildIndividualPayload:
 
     def test_sub_range_indices(self):
         payload = _build_individual_payload(
-            led_start=10, led_end=14, filled_count=3,
-            progress_color=(0, 255, 0), background_color=(0, 0, 0),
-            gradient_mode=False, gradient_start=(0, 0, 0), gradient_end=(0, 0, 0),
+            led_start=10,
+            led_end=14,
+            filled_count=3,
+            progress_color=(0, 255, 0),
+            background_color=(0, 0, 0),
+            gradient_mode=False,
+            gradient_start=(0, 0, 0),
+            gradient_end=(0, 0, 0),
             reverse=False,
         )
         indices = payload[::4]
@@ -190,9 +229,14 @@ class TestBuildIndividualPayload:
 
     def test_zero_filled_all_background(self):
         payload = _build_individual_payload(
-            led_start=0, led_end=4, filled_count=0,
-            progress_color=(0, 255, 0), background_color=(10, 10, 10),
-            gradient_mode=False, gradient_start=(0, 0, 0), gradient_end=(0, 0, 0),
+            led_start=0,
+            led_end=4,
+            filled_count=0,
+            progress_color=(0, 255, 0),
+            background_color=(10, 10, 10),
+            gradient_mode=False,
+            gradient_start=(0, 0, 0),
+            gradient_end=(0, 0, 0),
             reverse=False,
         )
         colors = _led_colors(payload, 0, 4)
@@ -201,9 +245,14 @@ class TestBuildIndividualPayload:
 
     def test_fully_filled_all_progress(self):
         payload = _build_individual_payload(
-            led_start=0, led_end=4, filled_count=5,
-            progress_color=(0, 200, 100), background_color=(10, 10, 10),
-            gradient_mode=False, gradient_start=(0, 0, 0), gradient_end=(0, 0, 0),
+            led_start=0,
+            led_end=4,
+            filled_count=5,
+            progress_color=(0, 200, 100),
+            background_color=(10, 10, 10),
+            gradient_mode=False,
+            gradient_start=(0, 0, 0),
+            gradient_end=(0, 0, 0),
             reverse=False,
         )
         colors = _led_colors(payload, 0, 4)
@@ -213,9 +262,14 @@ class TestBuildIndividualPayload:
     def test_gradient_reverse(self):
         """Gradient in reverse mode: LED at the far end gets gradient_start."""
         payload = _build_individual_payload(
-            led_start=0, led_end=4, filled_count=5,
-            progress_color=(0, 0, 0), background_color=(0, 0, 0),
-            gradient_mode=True, gradient_start=(0, 0, 255), gradient_end=(0, 255, 0),
+            led_start=0,
+            led_end=4,
+            filled_count=5,
+            progress_color=(0, 0, 0),
+            background_color=(0, 0, 0),
+            gradient_mode=True,
+            gradient_start=(0, 0, 255),
+            gradient_end=(0, 255, 0),
             reverse=True,
         )
         colors = _led_colors(payload, 0, 4)

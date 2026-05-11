@@ -9,11 +9,10 @@ To run against a real HA environment use pytest-homeassistant-custom-component
 (see pyproject.toml dev dependencies).
 """
 
-import pytest
 from custom_components.wled_progress_bar.coordinator import (
-    _parse_rgb,
-    _lerp_color,
     _build_individual_payload,
+    _lerp_color,
+    _parse_rgb,
 )
 
 
@@ -66,9 +65,14 @@ class TestBuildIndividualPayload:
 
     def test_all_leds_present(self):
         payload = _build_individual_payload(
-            led_start=0, led_end=9, filled_count=5,
-            progress_color=(0, 255, 0), background_color=(0, 0, 0),
-            gradient_mode=False, gradient_start=(0, 0, 255), gradient_end=(0, 255, 0),
+            led_start=0,
+            led_end=9,
+            filled_count=5,
+            progress_color=(0, 255, 0),
+            background_color=(0, 0, 0),
+            gradient_mode=False,
+            gradient_start=(0, 0, 255),
+            gradient_end=(0, 255, 0),
             reverse=False,
         )
         # Interleaved: 4 ints per LED (index + r + g + b)
@@ -76,9 +80,14 @@ class TestBuildIndividualPayload:
 
     def test_filled_forward(self):
         payload = _build_individual_payload(
-            led_start=0, led_end=9, filled_count=4,
-            progress_color=(0, 255, 0), background_color=(50, 50, 50),
-            gradient_mode=False, gradient_start=(0, 0, 255), gradient_end=(0, 255, 0),
+            led_start=0,
+            led_end=9,
+            filled_count=4,
+            progress_color=(0, 255, 0),
+            background_color=(50, 50, 50),
+            gradient_mode=False,
+            gradient_start=(0, 0, 255),
+            gradient_end=(0, 255, 0),
             reverse=False,
         )
         colors = self._led_colors(payload, 0, 9)
@@ -91,9 +100,14 @@ class TestBuildIndividualPayload:
 
     def test_filled_reverse(self):
         payload = _build_individual_payload(
-            led_start=0, led_end=9, filled_count=3,
-            progress_color=(255, 0, 0), background_color=(0, 0, 0),
-            gradient_mode=False, gradient_start=(0, 0, 255), gradient_end=(255, 0, 0),
+            led_start=0,
+            led_end=9,
+            filled_count=3,
+            progress_color=(255, 0, 0),
+            background_color=(0, 0, 0),
+            gradient_mode=False,
+            gradient_start=(0, 0, 255),
+            gradient_end=(255, 0, 0),
             reverse=True,
         )
         colors = self._led_colors(payload, 0, 9)
@@ -106,9 +120,14 @@ class TestBuildIndividualPayload:
     def test_background_off(self):
         """background_color=None should produce (0,0,0) for background LEDs."""
         payload = _build_individual_payload(
-            led_start=0, led_end=4, filled_count=2,
-            progress_color=(0, 200, 0), background_color=None,
-            gradient_mode=False, gradient_start=(0, 0, 0), gradient_end=(0, 0, 0),
+            led_start=0,
+            led_end=4,
+            filled_count=2,
+            progress_color=(0, 200, 0),
+            background_color=None,
+            gradient_mode=False,
+            gradient_start=(0, 0, 0),
+            gradient_end=(0, 0, 0),
             reverse=False,
         )
         colors = self._led_colors(payload, 0, 4)
@@ -117,9 +136,14 @@ class TestBuildIndividualPayload:
 
     def test_gradient(self):
         payload = _build_individual_payload(
-            led_start=0, led_end=4, filled_count=5,
-            progress_color=(0, 0, 0), background_color=(0, 0, 0),
-            gradient_mode=True, gradient_start=(0, 0, 255), gradient_end=(0, 255, 0),
+            led_start=0,
+            led_end=4,
+            filled_count=5,
+            progress_color=(0, 0, 0),
+            background_color=(0, 0, 0),
+            gradient_mode=True,
+            gradient_start=(0, 0, 255),
+            gradient_end=(0, 255, 0),
             reverse=False,
         )
         colors = self._led_colors(payload, 0, 4)
@@ -130,9 +154,14 @@ class TestBuildIndividualPayload:
     def test_sub_range(self):
         """Verify led_start offset is applied correctly to physical indices."""
         payload = _build_individual_payload(
-            led_start=10, led_end=14, filled_count=3,
-            progress_color=(0, 255, 0), background_color=(0, 0, 0),
-            gradient_mode=False, gradient_start=(0, 0, 0), gradient_end=(0, 0, 0),
+            led_start=10,
+            led_end=14,
+            filled_count=3,
+            progress_color=(0, 255, 0),
+            background_color=(0, 0, 0),
+            gradient_mode=False,
+            gradient_start=(0, 0, 0),
+            gradient_end=(0, 0, 0),
             reverse=False,
         )
         # Physical indices should be 10-14

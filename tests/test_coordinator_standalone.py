@@ -12,10 +12,12 @@ import types
 # ── Minimal HA stubs so coordinator.py can be imported without homeassistant ──
 # We inject just enough dummy modules to satisfy the import chain.
 
+
 def _stub_module(name):
     mod = types.ModuleType(name)
     sys.modules[name] = mod
     return mod
+
 
 for _name in [
     "homeassistant",
@@ -27,9 +29,12 @@ for _name in [
     if _name not in sys.modules:
         _stub_module(_name)
 
+
 # DataUpdateCoordinator stub
 class _FakeCoordinator:
-    def __init__(self, *a, **kw): pass
+    def __init__(self, *a, **kw):
+        pass
+
 
 sys.modules["homeassistant.helpers.update_coordinator"].DataUpdateCoordinator = _FakeCoordinator
 sys.modules["homeassistant.helpers.update_coordinator"].UpdateFailed = Exception
@@ -40,17 +45,28 @@ _ha_core.HomeAssistant = object
 _ha_core.callback = lambda f: f  # no-op decorator stub
 
 # ── Now import the helpers from coordinator ───────────────────────────────────
-import importlib, importlib.util, pathlib
+import importlib  # noqa: E402
+import importlib.util  # noqa: E402
+import pathlib  # noqa: E402
 
-_COORD_PATH = pathlib.Path(__file__).parent.parent / "custom_components" / "wled_progress_bar" / "coordinator.py"
+_COORD_PATH = (
+    pathlib.Path(__file__).parent.parent
+    / "custom_components"
+    / "wled_progress_bar"
+    / "coordinator.py"
+)
 
 # We load coordinator.py as a standalone module to avoid the HA import chain.
 _spec = importlib.util.spec_from_file_location("_coord_helpers", _COORD_PATH)
 _mod = importlib.util.module_from_spec(_spec)
 
 # Pre-stub const imports used by coordinator.py
-_const_path = pathlib.Path(__file__).parent.parent / "custom_components" / "wled_progress_bar" / "const.py"
-_const_spec = importlib.util.spec_from_file_location("custom_components.wled_progress_bar.const", _const_path)
+_const_path = (
+    pathlib.Path(__file__).parent.parent / "custom_components" / "wled_progress_bar" / "const.py"
+)
+_const_spec = importlib.util.spec_from_file_location(
+    "custom_components.wled_progress_bar.const", _const_path
+)
 _const_mod = importlib.util.module_from_spec(_const_spec)
 _const_spec.loader.exec_module(_const_mod)
 sys.modules["custom_components.wled_progress_bar.const"] = _const_mod
@@ -63,6 +79,7 @@ _build_individual_payload = _mod._build_individual_payload
 
 
 # ── Tests ──────────────────────────────────────────────────────────────────────
+
 
 class TestParseRGB:
     def test_valid(self):
@@ -112,18 +129,28 @@ class TestBuildIndividualPayload:
 
     def test_all_leds_present(self):
         payload = _build_individual_payload(
-            led_start=0, led_end=9, filled_count=5,
-            progress_color=(0, 255, 0), background_color=(0, 0, 0),
-            gradient_mode=False, gradient_start=(0, 0, 255), gradient_end=(0, 255, 0),
+            led_start=0,
+            led_end=9,
+            filled_count=5,
+            progress_color=(0, 255, 0),
+            background_color=(0, 0, 0),
+            gradient_mode=False,
+            gradient_start=(0, 0, 255),
+            gradient_end=(0, 255, 0),
             reverse=False,
         )
         assert len(payload) == 10 * 4
 
     def test_filled_forward(self):
         payload = _build_individual_payload(
-            led_start=0, led_end=9, filled_count=4,
-            progress_color=(0, 255, 0), background_color=(50, 50, 50),
-            gradient_mode=False, gradient_start=(0, 0, 255), gradient_end=(0, 255, 0),
+            led_start=0,
+            led_end=9,
+            filled_count=4,
+            progress_color=(0, 255, 0),
+            background_color=(50, 50, 50),
+            gradient_mode=False,
+            gradient_start=(0, 0, 255),
+            gradient_end=(0, 255, 0),
             reverse=False,
         )
         colors = self._led_colors(payload, 0, 9)
@@ -134,9 +161,14 @@ class TestBuildIndividualPayload:
 
     def test_filled_reverse(self):
         payload = _build_individual_payload(
-            led_start=0, led_end=9, filled_count=3,
-            progress_color=(255, 0, 0), background_color=(0, 0, 0),
-            gradient_mode=False, gradient_start=(0, 0, 255), gradient_end=(255, 0, 0),
+            led_start=0,
+            led_end=9,
+            filled_count=3,
+            progress_color=(255, 0, 0),
+            background_color=(0, 0, 0),
+            gradient_mode=False,
+            gradient_start=(0, 0, 255),
+            gradient_end=(255, 0, 0),
             reverse=True,
         )
         colors = self._led_colors(payload, 0, 9)
@@ -147,9 +179,14 @@ class TestBuildIndividualPayload:
 
     def test_background_none_is_black(self):
         payload = _build_individual_payload(
-            led_start=0, led_end=4, filled_count=2,
-            progress_color=(0, 200, 0), background_color=None,
-            gradient_mode=False, gradient_start=(0, 0, 0), gradient_end=(0, 0, 0),
+            led_start=0,
+            led_end=4,
+            filled_count=2,
+            progress_color=(0, 200, 0),
+            background_color=None,
+            gradient_mode=False,
+            gradient_start=(0, 0, 0),
+            gradient_end=(0, 0, 0),
             reverse=False,
         )
         colors = self._led_colors(payload, 0, 4)
@@ -158,9 +195,14 @@ class TestBuildIndividualPayload:
 
     def test_gradient_endpoints(self):
         payload = _build_individual_payload(
-            led_start=0, led_end=4, filled_count=5,
-            progress_color=(0, 0, 0), background_color=(0, 0, 0),
-            gradient_mode=True, gradient_start=(0, 0, 255), gradient_end=(0, 255, 0),
+            led_start=0,
+            led_end=4,
+            filled_count=5,
+            progress_color=(0, 0, 0),
+            background_color=(0, 0, 0),
+            gradient_mode=True,
+            gradient_start=(0, 0, 255),
+            gradient_end=(0, 255, 0),
             reverse=False,
         )
         colors = self._led_colors(payload, 0, 4)
@@ -169,9 +211,14 @@ class TestBuildIndividualPayload:
 
     def test_sub_range_physical_indices(self):
         payload = _build_individual_payload(
-            led_start=10, led_end=14, filled_count=3,
-            progress_color=(0, 255, 0), background_color=(0, 0, 0),
-            gradient_mode=False, gradient_start=(0, 0, 0), gradient_end=(0, 0, 0),
+            led_start=10,
+            led_end=14,
+            filled_count=3,
+            progress_color=(0, 255, 0),
+            background_color=(0, 0, 0),
+            gradient_mode=False,
+            gradient_start=(0, 0, 0),
+            gradient_end=(0, 0, 0),
             reverse=False,
         )
         indices = payload[::4]
@@ -179,9 +226,14 @@ class TestBuildIndividualPayload:
 
     def test_zero_filled(self):
         payload = _build_individual_payload(
-            led_start=0, led_end=4, filled_count=0,
-            progress_color=(0, 255, 0), background_color=(10, 10, 10),
-            gradient_mode=False, gradient_start=(0, 0, 0), gradient_end=(0, 0, 0),
+            led_start=0,
+            led_end=4,
+            filled_count=0,
+            progress_color=(0, 255, 0),
+            background_color=(10, 10, 10),
+            gradient_mode=False,
+            gradient_start=(0, 0, 0),
+            gradient_end=(0, 0, 0),
             reverse=False,
         )
         colors = self._led_colors(payload, 0, 4)
@@ -190,9 +242,14 @@ class TestBuildIndividualPayload:
 
     def test_fully_filled(self):
         payload = _build_individual_payload(
-            led_start=0, led_end=4, filled_count=5,
-            progress_color=(0, 200, 100), background_color=(10, 10, 10),
-            gradient_mode=False, gradient_start=(0, 0, 0), gradient_end=(0, 0, 0),
+            led_start=0,
+            led_end=4,
+            filled_count=5,
+            progress_color=(0, 200, 100),
+            background_color=(10, 10, 10),
+            gradient_mode=False,
+            gradient_start=(0, 0, 0),
+            gradient_end=(0, 0, 0),
             reverse=False,
         )
         colors = self._led_colors(payload, 0, 4)
