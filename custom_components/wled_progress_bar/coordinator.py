@@ -152,7 +152,7 @@ def _build_individual_payload(
     total_leds = led_end - led_start + 1
     bg_rgb = background_color if background_color is not None else (0, 0, 0)
 
-    # Build a list of (led_index, r, g, b) for every LED in the range.
+    # Build a list of [index, [r, g, b]] pairs for every LED in the range.
     payload: list[int | list[int]] = []
     for offset in range(total_leds):
         physical_idx = led_start + offset
@@ -178,9 +178,10 @@ def _build_individual_payload(
         else:
             color = bg_rgb
 
-        # Interleaved format: [index, r, g, b]
+        # WLED requires [index, [r, g, b], ...] — nested array for the color so
+        # WLED can distinguish position integers from RGB component integers.
         payload.append(physical_idx)
-        payload.extend(color)
+        payload.append(list(color))
 
     return payload
 
@@ -449,10 +450,11 @@ class WLEDProgressBarCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         led_end = int(opts.get(CONF_LED_END, led_start + led_count - 1))
         brightness = int(opts.get(CONF_BRIGHTNESS, DEFAULT_BRIGHTNESS))
 
-        # Build an all-black individual payload.
-        individual_payload: list[int] = []
+        # Build an all-black individual payload using [index, [r,g,b]] format.
+        individual_payload: list = []
         for idx in range(led_start, led_end + 1):
-            individual_payload.extend([idx, 0, 0, 0])
+            individual_payload.append(idx)
+            individual_payload.append([0, 0, 0])
 
         wled_payload = {
             "on": True,
