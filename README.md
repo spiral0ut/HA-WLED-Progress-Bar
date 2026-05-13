@@ -1,4 +1,5 @@
 # WLED Progress Bar for Home Assistant
+# UNTESTED - Use at your own risk!
 
 [![HACS Custom][hacs-badge]][hacs-url]
 [![GitHub release][release-badge]][release-url]
