@@ -469,28 +469,6 @@ Then restart HA and watch **Settings → System → Logs**.
 - [ ] MQTT push mode (bypass HTTP polling entirely)
 
 ---
-
-## Contributing
-
-Pull requests and issues are welcome.
-
-```bash
-# Install dev dependencies
-pip install -e ".[dev]"
-
-# Run tests
-pytest tests/test_led_helpers.py -v
-
-# Lint + format check
-ruff check custom_components/ tests/
-ruff format --check custom_components/ tests/
-```
-
-Please run both checks before opening a PR. The CI workflow enforces them on
-all PRs to `main`.
-
----
-
 ## License
 
 MIT — see [LICENSE](LICENSE).
