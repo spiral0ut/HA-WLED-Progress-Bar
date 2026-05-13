@@ -55,6 +55,7 @@ async def async_setup(hass: HomeAssistant, _config: dict) -> bool:
     """Serve the Lovelace card JS and register it as an extra module."""
     try:
         from homeassistant.components.http import StaticPathConfig  # HA 2024.6+
+
         await hass.http.async_register_static_paths(
             [StaticPathConfig("/wled_progress_bar", str(_WWW_PATH), cache_headers=False)]
         )
