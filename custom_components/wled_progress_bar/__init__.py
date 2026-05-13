@@ -19,9 +19,11 @@ Architecture:
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 from typing import Any
 
 import voluptuous as vol
+from homeassistant.components.frontend import async_register_extra_module_url
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, ServiceCall
@@ -43,7 +45,27 @@ from .coordinator import WLEDProgressBarCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: list[Platform] = [Platform.SENSOR]
+PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.SWITCH]
+
+_CARD_URL = "/wled_progress_bar/wled-progress-bar-card.js"
+_WWW_PATH = Path(__file__).parent / "www"
+
+
+async def async_setup(hass: HomeAssistant, _config: dict) -> bool:
+    """Serve the Lovelace card JS and register it as an extra module."""
+    try:
+        from homeassistant.components.http import StaticPathConfig  # HA 2024.6+
+        await hass.http.async_register_static_paths(
+            [StaticPathConfig("/wled_progress_bar", str(_WWW_PATH), cache_headers=False)]
+        )
+    except (ImportError, RuntimeError):
+        try:
+            hass.http.register_static_path("/wled_progress_bar", str(_WWW_PATH), False)
+        except RuntimeError:
+            pass  # already registered on a previous reload
+
+    async_register_extra_module_url(hass, _CARD_URL)
+    return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

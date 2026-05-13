@@ -194,6 +194,8 @@ class WLEDProgressBarCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._entity_id: str = entry.data.get(CONF_ENTITY_ID, "") or entry.options.get(
             CONF_ENTITY_ID, ""
         )
+        self._enabled: bool = False
+        self._saved_wled_state: dict[str, Any] | None = None
 
         # Will be overridden from options each refresh cycle.
         interval = int(entry.options.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL))
@@ -204,6 +206,48 @@ class WLEDProgressBarCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             name=f"{DOMAIN}_{self._host}",
             update_interval=timedelta(seconds=interval),
         )
+
+    # ── Enable / disable ───────────────────────────────────────────────────────
+
+    @property
+    def is_enabled(self) -> bool:
+        return self._enabled
+
+    def set_enabled(self, enabled: bool) -> None:
+        self._enabled = enabled
+
+    async def async_save_wled_state(self) -> None:
+        """GET current WLED state and cache it so we can restore it later."""
+        url = f"http://{self._host.rstrip('/')}{WLED_JSON_STATE_PATH}"
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, timeout=_AIOHTTP_TIMEOUT) as resp:
+                    if resp.status == 200:
+                        self._saved_wled_state = await resp.json(content_type=None)
+                    else:
+                        _LOGGER.warning(
+                            "Could not snapshot WLED state at %s (HTTP %s)", self._host, resp.status
+                        )
+        except Exception as exc:  # noqa: BLE001
+            _LOGGER.warning("Could not snapshot WLED state at %s: %s", self._host, exc)
+
+    async def async_restore_wled_state(self) -> None:
+        """POST the saved WLED state back. Falls back to clear_bar if no snapshot."""
+        if self._saved_wled_state is None:
+            _LOGGER.debug("No saved WLED state; clearing bar instead")
+            await self.async_clear_bar()
+            return
+
+        state = dict(self._saved_wled_state)
+        # Strip read-only fields WLED won't accept on POST.
+        for ro_key in ("nightlight", "udpn", "lor", "time", "mainseg"):
+            state.pop(ro_key, None)
+        # Remove "i" from segments (write-only in WLED, never returned by GET).
+        if "seg" in state:
+            state["seg"] = [{k: v for k, v in seg.items() if k != "i"} for seg in state["seg"]]
+
+        await self._async_post_state(state)
+        self._saved_wled_state = None
 
     # ── Public helpers ─────────────────────────────────────────────────────────
 
@@ -235,7 +279,7 @@ class WLEDProgressBarCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         state = self.hass.states.get(entity_id)
         if state is None or state.state in ("unavailable", "unknown"):
             _LOGGER.debug("Source entity %s is unavailable; skipping WLED push", entity_id)
-            return {"value": None, "percent": None, "filled": 0}
+            return self.data or {"value": None, "percent": None, "filled": 0}
 
         try:
             raw_value = float(state.state)
@@ -245,10 +289,13 @@ class WLEDProgressBarCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 entity_id,
                 state.state,
             )
-            return {"value": None, "percent": None, "filled": 0}
+            return self.data or {"value": None, "percent": None, "filled": 0}
 
-        result = await self._push_to_wled(raw_value)
-        return result
+        if not self._enabled:
+            # Return current data so sensor stays live without touching WLED.
+            return self.data or {"value": None, "percent": None, "filled": 0}
+
+        return await self._push_to_wled(raw_value)
 
     # ── Core logic ─────────────────────────────────────────────────────────────
 

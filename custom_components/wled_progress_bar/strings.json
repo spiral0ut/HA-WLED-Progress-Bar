@@ -58,6 +58,11 @@
       "progress_percent": {
         "name": "Progress"
       }
+    },
+    "switch": {
+      "active": {
+        "name": "Progress Bar Active"
+      }
     }
   }
 }
