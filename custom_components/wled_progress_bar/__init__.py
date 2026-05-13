@@ -23,7 +23,6 @@ from pathlib import Path
 from typing import Any
 
 import voluptuous as vol
-from homeassistant.components.frontend import async_register_extra_module_url
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, ServiceCall
@@ -59,13 +58,19 @@ async def async_setup(hass: HomeAssistant, _config: dict) -> bool:
         await hass.http.async_register_static_paths(
             [StaticPathConfig("/wled_progress_bar", str(_WWW_PATH), cache_headers=False)]
         )
-    except (ImportError, RuntimeError):
+    except (ImportError, AttributeError, RuntimeError):
         try:
             hass.http.register_static_path("/wled_progress_bar", str(_WWW_PATH), False)
-        except RuntimeError:
+        except (AttributeError, RuntimeError):
             pass  # already registered on a previous reload
 
-    async_register_extra_module_url(hass, _CARD_URL)
+    try:
+        from homeassistant.components.frontend import async_register_extra_module_url
+
+        async_register_extra_module_url(hass, _CARD_URL)
+    except (ImportError, AttributeError):
+        _LOGGER.warning("Could not auto-register Lovelace card resource")
+
     return True
 
 
